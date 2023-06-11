@@ -1,0 +1,70 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: myapp-backend-container
+    image: myapp-backend-image
+    restart: unless-stopped
+    ports:
+      - 8000:5000
+    depends_on:
+      - mongodb
+    env_file:
+      - ./backend/.env
+    environment:
+      #- MONGODB_URI=mongodb://mongodb:27017/myappdb
+      - MONGODB_URI=mongodb+srv://Mohak_Tripathi:mohak1234@ecommerceprotipshop.kouma.mongodb.net/ProEcommerce?retryWrites=true&w=majority
+      - NODE_ENV=production
+      - JWT_SECRET=abc123
+      - PAYPAL_CLIENT_ID=ASDrqhtTtzChLRGU9tH4XD3TOuN3dJZ4QPw3MltMQMWsmZXEhnsdkckgpm-btwfAmWAaMKfzgNUVpoMb
+  
+    # command: /usr/src/app/node_modules/.bin/nodemon server.js
+    # volumes:
+    #   - ./server/:/usr/src/app
+    #   - /usr/src/app/node_modules
+    #networks:
+      #- app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: myapp-frontend-container
+    image: myapp-frontend-image
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    #networks:
+      #- app-network
+    # command: npm start
+    # volumes:
+    #   - ./client/:/usr/app
+    #   - /usr/app/node_modules
+
+  mongodb:
+    image: mongo:latest
+    container_name: myapp-mongodb-container
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=myappdb
+      #- MONGO_INITDB_ROOT_ROLE=readWrite
+    #networks:
+     # - app-network
+
+volumes:
+  mongo-data:
+    driver: local
+
+#networks:
+  #app-network:
+    #driver: bridge
